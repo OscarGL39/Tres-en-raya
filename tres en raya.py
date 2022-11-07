@@ -1,106 +1,243 @@
+"""
+Juego de Tres en Raya Aleatorio
+Fecha: 07/11/2022
+Autor: Oscar Gonzalez Lujan
+"""
+# Posibles variantes:
+# -5 en raya
+# -3 en raya inverso
+# -notakto
+# -3 en raya de turno aleatorio
+# -cuadrado mágico (pares vs impares)
+# -Jugador 2 automático
+# -Jugador 1 y 2 automáticos
+# -Simulación N partidas automáticas y estadística
 import random
-import os
+import time
 
-def inicializar_juego():
-    """Función que incializa los valores del juego"""
-    juego_en_curso = True
-    jugadores = [[input("Jugador 1: "),"X"], [input("Jugador 2: "),"O"]]
-    jugador_actual = random.randint(0, 1)
-    tablero = [["-","-","-"],["-","-","-"],["-","-","-"]]
-    return juego_en_curso, jugadores, jugador_actual, tablero
+def bienvenida():
+    print("\t**************************************************")
+    print("\t********Juego del Tres en Raya Aleatorio 1DAW*******")
+    print("\t**************************************************")
+    return
 
-def actualizar_tablero(jugador, coordenada_fila, coordenada_columna, tablero_actual):
-    """Actualiza el tablero con la acción del jugador actual"""
-    tablero_actual[coordenada_fila - 1][coordenada_columna - 1] = jugador[1]
-    return tablero_actual
+def presentacionJugadores():
+    jugador1Nombre = input("Jugador 1, ¿cuál es tu nombre?: ")
+    time.sleep(0.25)
+    ficha1 = input(f"{jugador1Nombre}, ¿qué ficha eliges? (X/O): ")
+    time.sleep(1)
+    jugador2Nombre = input("Jugador 2, ¿cuál es tu nombre?: ")
+    time.sleep(0.25)
+    if ficha1 == 'X': ficha2 = 'O' 
+    else: ficha2 = 'X'
+    print(f"{jugador2Nombre}, tu ficha es {ficha2}")
+    return jugador1Nombre, jugador2Nombre, ficha1, ficha2
 
-def tablero_completo(tablero_actual):
-    """Comprueba si el tablero está completo, devuelve True o False"""
-    for linea in tablero_actual:
-        for celda in linea:
-            if celda == '-':
-                return False
-    return True
+def pintarTablero(tablero):
+    print()
+    print("\t##################################################")
+    print("\t##\t \t##\t \t##\t \t##")
+    print(f"\t##\t{tablero[0]}\t##\t{tablero[1]}\t##\t{tablero[2]}\t##")
+    print("\t##\t \t##\t \t##\t \t##")
+    print("\t##################################################")
+    print("\t##\t \t##\t \t##\t \t##")
+    print(f"\t##\t{tablero[3]}\t##\t{tablero[4]}\t##\t{tablero[5]}\t##")
+    print("\t##\t \t##\t \t##\t \t##")
+    print("\t##################################################")
+    print("\t##\t \t##\t \t##\t \t##")
+    print(f"\t##\t{tablero[6]}\t##\t{tablero[7]}\t##\t{tablero[8]}\t##")
+    print("\t##\t \t##\t \t##\t \t##")
+    print("\t##################################################")
+    print()
+    return
 
-def comprobar_ganador(jugador, tablero_actual):
-    """Comprueba si ha ganado el jugador actual, devuelve True o False"""
-    #Comprobar por filas
-    for i in range(3):
-        ganador = True
-        for x in range(3):
-            if tablero_actual[i][x] != jugador[1]:
-                ganador = False
-                break
-        if ganador:
-            return ganador
+def hacerJugada (jugador):
+    while True:
+        posicion = int(input(f"{jugador}, ¿dónde quieres poner ficha? [0-8]: "))
+        if tablero[posicion] == '' :
+            return posicion
+        else:
+            print("Casilla ocupada!\n")
 
-    #Comprobar por columnas
-    for i in range(3):
-        ganador = True
-        for x in range(3):
-            if tablero_actual[x][i] != jugador[1]:
-                ganador = False
-                break
-        if ganador:
-            return ganador
+def comprobarPartida(ficha1):
+    # Compruebo líneas horizontales
+    if tablero[0] == ficha1 and tablero[1] == ficha1 and tablero[2] == ficha1:
+        return True
+    elif tablero[3] == ficha1 and tablero[4] == ficha1 and tablero[5] == ficha1:
+        return True
+    elif tablero[6] == ficha1 and tablero[7] == ficha1 and tablero[8] == ficha1:
+        return True
+    # Compruebo líneas verticales
+    elif tablero[0] == ficha1 and tablero[3] == ficha1 and tablero[6] == ficha1:
+        return True
+    elif tablero[1] == ficha1 and tablero[4] == ficha1 and tablero[7] == ficha1:
+        return True
+    elif tablero[2] == ficha1 and tablero[5] == ficha1 and tablero[8] == ficha1:
+        return True
+    # Compruebo líneas diagonales
+    elif tablero[0] == ficha1 and tablero[4] == ficha1 and tablero[8] == ficha1:
+        return True
+    elif tablero[2] == ficha1 and tablero[4] == ficha1 and tablero[6] == ficha1:
+        return True
+    else:
+        return False
 
-    #Comprobar por diagonales
-    ganador = True
-    for i in range(3):
-        if tablero_actual[i][i] != jugador[1]:
-            ganador = False
+#Secuencia principal de programas
+bienvenida()
+tablero = ['']*9
+pintarTablero(tablero)
+time.sleep(1)
+
+jugador1Nombre, jugador2Nombre, ficha1, ficha2 = presentacionJugadores()
+time.sleep(1)
+time.sleep(1)
+
+# Sólo para debug
+# jugador1Nombre, jugador2Nombre, ficha1, ficha2 = 'Albert', 'Oscar', 'X', 'O'
+
+# Bucle principal
+ganador = False
+pintarTablero(tablero)
+while True:
+    time.sleep(1)
+    jugada = random.choice([jugador1Nombre, jugador2Nombre])
+    #Turno jugador 1
+    if jugada == jugador1Nombre:
+        posicion = hacerJugada(jugador1Nombre)
+        tablero[posicion] = ficha1
+        time.sleep(0.25)
+        pintarTablero(tablero)
+        time.sleep(1)
+        ganador = comprobarPartida(ficha1)
+        if ganador: 
+            print(f"\nFelicidades {jugador1Nombre}!!! Has ganado la partida")
             break
-    if ganador:
-        return ganador
-
-    ganador = True
-    for i in range(3):
-        if tablero_actual[i][3 - 1 - i] != jugador[1]:
-            ganador = False
+    #Turno jugador 2
+    else:
+        posicion = hacerJugada(jugador2Nombre)
+        tablero[posicion] = ficha2
+        time.sleep(0.25)
+        pintarTablero(tablero)
+        time.sleep(0.25)
+        ganador = comprobarPartida(ficha2)
+        if ganador: 
+            print(f"\Felicidades {jugador2Nombre}!!! Has ganado la partida")
             break
-    if ganador:
-        return ganador
-    
-    return False
 
-juego_en_curso, jugadores, jugador_actual, tablero = inicializar_juego()
 
-while juego_en_curso:
-    if tablero_completo(tablero):
-        juego_en_curso = False
-        os.system("cls")
-        print("Fin del juego, no hay ganador")
-        break
+"""
+Juego de Tres en Raya
+Fecha: 07/11/2022
+Autor: Oscar Gonzalez Lujan
+"""
+import random
+import time
 
-    os.system("cls")
-    #Nuevo turno
-    print("Turno de: " + random.choice[jugador_actual][0])
+def bienvenida():
+    print("\t**************************************************")
+    print("\t********Bienvenido al Tres en Raya aleatorio by 1ºDAW*******")
+    print("\t**************************************************")
+    return
 
-    #Dibujar tablero
-    print("0 1 2 3")
-    coordenadas_vertical = 1
-    for linea in tablero:
-        print(coordenadas_vertical, linea[0], linea[1], linea[2])
-        coordenadas_vertical += 1
+def presentacionJugadores():
+    jugador1Nombre = input("Jugador 1, ¿cuál es tu nombre?: ")
+    time.sleep(0.25)
+    ficha1 = input(f"{jugador1Nombre}, ¿qué ficha eliges? (X/O): ")
+    time.sleep(1)
+    jugador2Nombre = input("Jugador 2, ¿cuál es tu nombre?: ")
+    time.sleep(0.25)
+    if ficha1 == 'X': ficha2 = 'O' 
+    else: ficha2 = 'X'
+    print(f"{jugador2Nombre}, tu ficha es {ficha2}")
+    return jugador1Nombre, jugador2Nombre, ficha1, ficha2
 
-    #Selección de casilla
-    coordenada_fila, coordenada_columna = list(map(int, input("Elige coordenadas: ")))
-    #Actuaizar tablero
-    tablero = actualizar_tablero(jugadores[jugador_actual], coordenada_fila, coordenada_columna, tablero)
+def pintarTablero(tablero):
+    print()
+    print("\t##################################################")
+    print("\t##\t \t##\t \t##\t \t##")
+    print(f"\t##\t{tablero[0]}\t##\t{tablero[1]}\t##\t{tablero[2]}\t##")
+    print("\t##\t \t##\t \t##\t \t##")
+    print("\t##################################################")
+    print("\t##\t \t##\t \t##\t \t##")
+    print(f"\t##\t{tablero[3]}\t##\t{tablero[4]}\t##\t{tablero[5]}\t##")
+    print("\t##\t \t##\t \t##\t \t##")
+    print("\t##################################################")
+    print("\t##\t \t##\t \t##\t \t##")
+    print(f"\t##\t{tablero[6]}\t##\t{tablero[7]}\t##\t{tablero[8]}\t##")
+    print("\t##\t \t##\t \t##\t \t##")
+    print("\t##################################################")
+    print()
+    return
 
-    #Comprobamos si ha ganado
-    if comprobar_ganador(jugadores[jugador_actual], tablero):
-        juego_en_curso = False
+def hacerJugada (jugador):
+    while True:
+        posicion = int(input(f"{jugador}, ¿dónde quieres poner ficha? [0-8]: "))
+        if tablero[posicion] == '' :
+            return posicion
+        else:
+            print("Casilla ocupada!\n")
 
-        #Dibujar tablero
-        os.system("cls")
-        print("0 1 2 3")
-        coordenadas_vertical = 1
-        for linea in tablero:
-            print(coordenadas_vertical, linea[0], linea[1], linea[2])
-            coordenadas_vertical += 1
+def comprobarPartida(ficha1):
+    # Compruebo líneas horizontales
+    if tablero[0] == ficha1 and tablero[1] == ficha1 and tablero[2] == ficha1:
+        return True
+    elif tablero[3] == ficha1 and tablero[4] == ficha1 and tablero[5] == ficha1:
+        return True
+    elif tablero[6] == ficha1 and tablero[7] == ficha1 and tablero[8] == ficha1:
+        return True
+    # Compruebo líneas verticales
+    elif tablero[0] == ficha1 and tablero[3] == ficha1 and tablero[6] == ficha1:
+        return True
+    elif tablero[1] == ficha1 and tablero[4] == ficha1 and tablero[7] == ficha1:
+        return True
+    elif tablero[2] == ficha1 and tablero[5] == ficha1 and tablero[8] == ficha1:
+        return True
+    # Compruebo líneas diagonales
+    elif tablero[0] == ficha1 and tablero[4] == ficha1 and tablero[8] == ficha1:
+        return True
+    elif tablero[2] == ficha1 and tablero[4] == ficha1 and tablero[6] == ficha1:
+        return True
+    else:
+        return False
 
-        print("Ganador: ",jugadores[jugador_actual][0])
+#Secuencia principal de programas
+bienvenida()
+tablero = ['']*9
+pintarTablero(tablero)
+time.sleep(1)
 
-    #Cambio de jugador
-    jugador_actual = 1 if jugador_actual == 0 else 0
+jugador1Nombre, jugador2Nombre, ficha1, ficha2 = presentacionJugadores()
+time.sleep(1)
+time.sleep(1)
+
+# Sólo para debug
+# jugador1Nombre, jugador2Nombre, ficha1, ficha2 = 'Albert', 'Oscar', 'X', 'O'
+
+# Bucle principal
+ganador = False
+pintarTablero(tablero)
+while True:
+    time.sleep(1)
+    jugada = random.choice([jugador1Nombre, jugador2Nombre])
+    #Turno jugador 1
+    if jugada == jugador1Nombre:
+        posicion = hacerJugada(jugador1Nombre)
+        tablero[posicion] = ficha1
+        time.sleep(0.25)
+        pintarTablero(tablero)
+        time.sleep(1)
+        ganador = comprobarPartida(ficha1)
+        if ganador: 
+            print(f"\nFelicidades {jugador1Nombre}!!! Has ganado la partida")
+            break
+    #Turno jugador 2
+    else:
+        posicion = hacerJugada(jugador2Nombre)
+        tablero[posicion] = ficha2
+        time.sleep(0.25)
+        pintarTablero(tablero)
+        time.sleep(0.25)
+        ganador = comprobarPartida(ficha2)
+        if ganador: 
+            print(f"\Felicidades {jugador2Nombre}!!! Has ganado la partida")
+            break
